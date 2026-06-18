@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Резервируем место под вертикальный скроллбар, чтобы контент не «прыгал»
+       между вкладками разной высоты (дашборд переставал съезжать). */
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+  }
+  body {
+    @apply text-[#1D1D1F] dark:text-[#ECECF1] antialiased;
+    background-color: #F7F8FB;
+  }
+  .dark body { background-color: #16171C; }
+  * { -webkit-tap-highlight-color: transparent; }
+  ::selection { background: rgba(77,107,254,0.22); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-[18px] border border-black/[0.05] dark:border-white/[0.06] bg-white/80 dark:bg-ink-850/70 backdrop-blur-2xl shadow-apple;
+  }
+  .card-interactive {
+    @apply card spotlight transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-apple-lg hover:border-brand-500/40 dark:hover:border-brand-500/40 hover:bg-white/90 dark:hover:bg-ink-850/85;
+  }
+  /* Spotlight — мягкое свечение следует за курсором по карточке */
+  .spotlight { position: relative; }
+  .spotlight::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(77,107,254,0.14), transparent 60%);
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .spotlight:hover::before { opacity: 1; }
+  .spotlight > * { position: relative; z-index: 1; }
+
+  /* Анимированная градиентная рамка */
+  .gradient-border {
+    position: relative;
+    background-clip: padding-box;
+  }
+  .gradient-border::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(120deg, rgba(77,107,254,0.6), rgba(156,107,255,0.5), rgba(115,136,255,0.6));
+    background-size: 200% 200%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: gradientPan 6s ease infinite;
+    pointer-events: none;
+  }
+
+  /* gradient text utility for headings */
+  .text-gradient {
+    @apply bg-clip-text text-transparent font-display;
+    background-image: linear-gradient(120deg, #1D1D1F 0%, #4D6BFE 100%);
+    letter-spacing: -0.02em;
+  }
+  .dark .text-gradient { background-image: linear-gradient(120deg, #ECECF1 0%, #9DAEFF 100%); }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-[transform,background-color,box-shadow,border-color,color] duration-200 ease-out disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96] active:duration-75;
+  }
+  .btn-primary {
+    @apply btn bg-brand-500 text-white hover:bg-brand-600 hover:shadow-glow hover:-translate-y-px active:translate-y-0;
+  }
+  /* Animated gradient CTA with a moving sheen — for hero actions */
+  .btn-gradient {
+    @apply btn relative overflow-hidden text-white active:scale-[0.98];
+    background-image: linear-gradient(110deg, #4D6BFE 0%, #7388FF 45%, #4D6BFE 100%);
+    background-size: 200% 100%;
+    box-shadow: 0 8px 24px rgba(77,107,254,0.35);
+    transition: background-position 600ms ease, box-shadow 250ms ease, transform 150ms ease;
+  }
+  .btn-gradient:hover { background-position: 100% 0; box-shadow: 0 10px 32px rgba(77,107,254,0.45); }
+  .btn-gradient::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 700ms ease;
+  }
+  .btn-gradient:hover::after { transform: translateX(120%); }
+  .skeleton {
+    @apply rounded-[8px] bg-[length:200%_100%] animate-shimmer;
+    background-image: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 37%, rgba(0,0,0,0.04) 63%);
+  }
+  .dark .skeleton {
+    background-image: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 37%, rgba(255,255,255,0.04) 63%);
+  }
+  .btn-ghost {
+    @apply btn text-[#1D1D1F] dark:text-[#ECECF1] hover:bg-black/[0.05] dark:hover:bg-white/[0.08];
+  }
+  .btn-outline {
+    @apply btn border border-black/[0.10] dark:border-white/[0.12] hover:bg-brand-500/[0.06] hover:border-brand-500/40 hover:text-brand-500 dark:hover:text-brand-300 hover:-translate-y-px active:translate-y-0;
+  }
+  .field {
+    @apply block text-[11px] font-semibold uppercase tracking-[0.06em] text-[#6E6E73] dark:text-[#8E8EA0] mb-2;
+  }
+  .input {
+    @apply w-full rounded-[12px] border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-ink-800 px-3.5 py-2.5 text-sm text-[#1D1D1F] dark:text-[#ECECF1] outline-none transition-all duration-200 focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500/60 placeholder:text-[#AEAEB2] dark:placeholder:text-[#5A5C66];
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-black/[0.07] dark:border-white/[0.08] bg-white dark:bg-ink-800 px-3 py-1.5 text-xs font-medium text-[#3A3A3C] dark:text-[#C8C8D4] cursor-pointer hover:border-brand-500/50 hover:text-brand-500 dark:hover:text-brand-300 hover:-translate-y-px active:scale-90 active:duration-75 select-none;
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  }
+  .chip-active {
+    @apply border-brand-500/50 bg-brand-500/10 dark:bg-brand-500/15 text-brand-500 dark:text-brand-300;
+    box-shadow: 0 2px 10px rgba(77,107,254,0.18);
+  }
+
+  .markdown h1 { @apply text-2xl font-semibold mt-2 mb-4 tracking-tight text-[#1D1D1F] dark:text-[#ECECF1]; }
+  .markdown h2 { @apply text-base font-semibold mt-6 mb-2 text-[#1D1D1F] dark:text-[#ECECF1]; }
+  .markdown p  { @apply my-2 leading-relaxed text-[#3A3A3C] dark:text-[#C8C8D4] text-sm; }
+  .markdown ul { @apply list-disc list-outside my-2 ml-5 space-y-1 text-[#3A3A3C] dark:text-[#C8C8D4] text-sm; }
+  .markdown ol { @apply list-decimal list-outside my-2 ml-5 space-y-2 text-[#3A3A3C] dark:text-[#C8C8D4] text-sm; }
+  .markdown li { @apply leading-relaxed; }
+  .markdown code { @apply rounded-[6px] bg-[#F0F1F5] dark:bg-ink-800 px-1.5 py-0.5 text-[0.82em] font-mono text-brand-600 dark:text-brand-300; }
+  .markdown strong { @apply font-semibold text-[#1D1D1F] dark:text-[#ECECF1]; }
+}
+
+/* ---- Aurora animated background ---- */
+.aurora-root { --px: 0; --py: 0; }
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  will-change: transform, translate;
+  /* parallax за курсором — отдельное свойство translate, чтобы не конфликтовать
+     с transform из keyframes (они композируются) */
+  transition: translate 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark .aurora-blob { opacity: 0.42; filter: blur(90px); }
+.aurora-blob--1 {
+  width: 46vw; height: 46vw; top: -12vw; right: -8vw;
+  background: radial-gradient(circle at 30% 30%, #6C8BFF, transparent 70%);
+  animation: auroraDrift1 24s ease-in-out infinite;
+  translate: calc(var(--px) * 28px) calc(var(--py) * 28px);
+}
+.aurora-blob--2 {
+  width: 42vw; height: 42vw; bottom: -14vw; left: -10vw;
+  background: radial-gradient(circle at 40% 40%, #4D6BFE, transparent 70%);
+  animation: auroraDrift2 30s ease-in-out infinite;
+  translate: calc(var(--px) * -42px) calc(var(--py) * -42px);
+}
+.aurora-blob--3 {
+  width: 34vw; height: 34vw; top: 35%; left: 45%;
+  background: radial-gradient(circle at 50% 50%, #9C6BFF, transparent 70%);
+  opacity: 0.30;
+  animation: auroraDrift3 36s ease-in-out infinite;
+  translate: calc(var(--px) * 60px) calc(var(--py) * 60px);
+}
+@keyframes auroraDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-6vw, 5vw) scale(1.12); }
+}
+@keyframes auroraDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(7vw, -4vw) scale(1.08); }
+}
+@keyframes auroraDrift3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-42%, -58%) scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(77,107,254,0.25); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(77,107,254,0.45); }
+::-webkit-scrollbar-track { background: transparent; }
